@@ -1,0 +1,2 @@
+*,*::before,*::after{-webkit-box-sizing:border-box;box-sizing:border-box;margin:0;padding:0}html,body{overflow:hidden}.canvasOverlay{background-color:#006a946b;pointer-events:none;width:100vw;height:100vh;position:absolute;top:0;left:0}canvas{width:100vw;height:100vh;background-color:#ffebb0}
+/*# sourceMappingURL=style.min.css.map */
