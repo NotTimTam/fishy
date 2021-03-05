@@ -86,7 +86,7 @@ function createFish(x, y) {
         x: x,
         y: y,
         angle: Math.random() * 360,
-        scale: randRange(0.8, 1),
+        scale: (Math.random() * (1 - 0.8 +1)) + 0.8,
         velocity: Math.random() * 1.5,
         talePos: 0,
         taleDir: -0.30,
@@ -117,13 +117,18 @@ function displayFish() {
         ctx.beginPath();
         ctx.fillStyle = curFish.color;
         // head
-        ctx.moveTo(c.x + (20 * curFish.scale), c.y);
-        ctx.translate(0.5,0.5);
-        ctx.lineTo(c.x + (18 * curFish.scale), c.y + (3 * curFish.scale));
-        ctx.lineTo(c.x + (10 * curFish.scale), c.y + (5 * curFish.scale));
-        ctx.lineTo(c.x + (10 * curFish.scale), c.y - (5 * curFish.scale));
-        ctx.lineTo(c.x + (18 * curFish.scale), c.y - (3 * curFish.scale));
+        // ctx.moveTo(c.x + (20 * curFish.scale), c.y);
+        // ctx.translate(0.5,0.5);
+        // ctx.lineTo(c.x + (18 * curFish.scale), c.y + (3 * curFish.scale));
+        // ctx.lineTo(c.x + (10 * curFish.scale), c.y + (5 * curFish.scale));
+        // ctx.lineTo(c.x + (10 * curFish.scale), c.y - (5 * curFish.scale));
+        // ctx.lineTo(c.x + (18 * curFish.scale), c.y - (3 * curFish.scale));
+        // ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(c.x + (9.25 * curFish.scale), c.y + (4.7 * curFish.scale));
+        ctx.quadraticCurveTo(c.x + (20 * curFish.scale), c.y + (0 * curFish.scale), c.x + (9.25 * curFish.scale), c.y - (5.6 * curFish.scale));
         ctx.fill();
+        ctx.closePath();
 
         // body
         ctx.moveTo(c.x + (10 * curFish.scale), c.y + (5 * curFish.scale));
