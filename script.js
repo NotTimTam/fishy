@@ -14,6 +14,18 @@ function tick() {
     } else { 
         return;
     }
+
+    if (fish.length > maxFish) {
+        fish.shift();
+    } if (fish.length < maxFish) {
+        createFish(Math.random() * canvas.clientWidth, Math.random() * canvas.clientHeight);
+    }
+
+    if (maxFish < 0) {
+        maxFish = 0;
+    } else if (maxFish > 300) {
+        maxFish = 300;
+    }
 }
 window.setInterval(tick, 1);
 
@@ -61,6 +73,7 @@ function positionToVector(x, y) {
 }
 
 let fish = [];
+let maxFish = 25;
 
 function createFish(x, y) {
     fish.push({
@@ -71,14 +84,10 @@ function createFish(x, y) {
         talePos: 0,
         taleDir: -0.5
     });
-
-    if (fish.length >= 100) {
-        fish.shift();
-    }
 }
 
-for (let i = 0; i < 25; i++) {
-    createFish(Math.random() * canvas.clientWidth, Math.random() * canvas.clientHeight)
+for (let i = 0; i < maxFish; i++) {
+    createFish(Math.random() * canvas.clientWidth, Math.random() * canvas.clientHeight);
 }
 
 // document.addEventListener("click", function (e) {
@@ -210,23 +219,19 @@ function updateFish() {
         // }
 
         // Keep the fish in bounds.
-        if (curFish.x < -150) {
-            curFish.x = 0;
-            curFish.angle = 0;
-        } else if (curFish.x > canvas.clientWidth + 150) {
-            curFish.x = canvas.clientWidth;
-            curFish.angle = 180;
+        if (curFish.x <= -50) {
+            curFish.x = canvas.clientWidth + 40;
+        } else if (curFish.x >= canvas.clientWidth + 50) {
+            curFish.x = -40;
         }
-        if (curFish.y < -150) {
-            curFish.y = 0;
-            curFish.angle = 90;
-        } else if (curFish.y > canvas.clientHeight + 150) {
-            curFish.y = canvas.clientHeight;
-            curFish.angle = 270;
+        if (curFish.y <= -50) {
+            curFish.y = canvas.clientHeight + 40;
+        } else if (curFish.y >= canvas.clientHeight + 50) {
+            curFish.y = -40;
         }
 
         // Get scared by the mouse.
-        if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 300 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
+        if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 100 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
             rotateFish(curFish, Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI) + Math.floor(Math.random() * (20 - -20 +1)) + -20;
             curFish.velocity = 1.5;
         }
