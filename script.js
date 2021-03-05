@@ -91,7 +91,7 @@ function createFish(x, y) {
         talePos: 0,
         taleDir: -0.30,
         followNeighbors: false,
-        color: `rgb(${Math.random() * 17},${Math.random() * 49},${Math.random() * 78})`
+        color: `#131313`
     });
 }
 
