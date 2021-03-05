@@ -235,8 +235,8 @@ function updateFish() {
         let neighbor = getClosestNeighbor(curFish);
         if (neighbor.activeNeighbor != undefined && neighbor.dist < 50) {
             rand = Math.random() * 1000;
-            if (rand <= 2) {
-                rotateFish(curFish, neighbor.activeNeighbor.angle, 1);
+            if (rand <= 15) {
+                rotateFish(curFish, neighbor.activeNeighbor.angle, 5);
                 curFish.velocity = neighbor.activeNeighbor.velocity;
             } else {
                 rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
