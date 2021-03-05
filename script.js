@@ -224,7 +224,7 @@ function updateFish() {
 
         // Get scared by the mouse.
         if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 150 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
-            rotateFish(curFish, Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI, 1);
+            rotateFish(curFish, Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI, 3);
             curFish.velocity = 1.1;
         } else {
             // Get the closest neighbor and interact with them.
