@@ -82,7 +82,7 @@ function createFish(x, y) {
         angle: Math.random() * 360,
         velocity: Math.random() * 1.5,
         talePos: 0,
-        taleDir: -0.5
+        taleDir: -0.30
     });
 }
 
@@ -165,6 +165,29 @@ function rotateFish(fish, angle, speed=3) {
     }
 }
 
+function getClosestNeighbor(curFish) {
+    let dist = Infinity;
+    let activeNeighbor;
+    for (let n = 0; n < fish.length; n++) {
+        let neighbor = fish[n];
+        let dt = distance(neighbor.x, neighbor.y, curFish.x, curFish.y);
+        
+        if (neighbor == curFish) {
+            continue;
+        } else {
+            if (dt < dist) {
+                dist = dt;
+                activeNeighbor = neighbor;
+            }
+        }
+    }
+
+    return {
+        dist: dist,
+        activeNeighbor: activeNeighbor
+    };
+}
+
 function updateFish() {
     for (let i = 0; i < fish.length; i++) {
         // Get the current fish.
@@ -187,8 +210,8 @@ function updateFish() {
         }
 
         // At random points in time the fish can change directions.
-        let rand = Math.round(Math.random() * 100);
-        if (rand >= 90) {
+        let rand = Math.ceil(Math.random() * 1000);
+        if (rand <= 2) {
             rotateFish(curFish, Math.random() * 360);
         }
 
@@ -231,9 +254,15 @@ function updateFish() {
         }
 
         // Get scared by the mouse.
-        if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 100 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
-            rotateFish(curFish, Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI) + Math.floor(Math.random() * (20 - -20 +1)) + -20;
+        if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 150 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
+            rotateFish(curFish, (Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI) + Math.floor(Math.random() * (20 - -20 +1)) + -20, 3);
             curFish.velocity = 1.5;
+        }
+
+        // Get the closest neighbor and interact with them.
+        let neighbor = getClosestNeighbor(curFish);
+        if (neighbor.activeNeighbor != undefined && neighbor.dist < 20) {
+            rotateFish(curFish, (Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI) + Math.floor(Math.random() * (20 - -20 +1)) + -20, 1);
         }
     }
 }
