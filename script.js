@@ -82,17 +82,15 @@ function createFish(x, y) {
         angle: Math.random() * 360,
         velocity: Math.random() * 1.5,
         talePos: 0,
-        taleDir: -0.30
+        taleDir: -0.30,
+        followNeighbors: false,
+        scale: Math.floor(Math.random() * (1.2 - 1 +1)) + 1
     });
 }
 
 for (let i = 0; i < maxFish; i++) {
     createFish(Math.random() * canvas.clientWidth, Math.random() * canvas.clientHeight);
 }
-
-// document.addEventListener("click", function (e) {
-//     createFish(mouse.x, mouse.y);
-// })
 
 function displayFish() {
     for (let i = 0; i < fish.length; i++) {
@@ -107,39 +105,31 @@ function displayFish() {
             x: 10,
             y: 5
         };
-        // ctx.moveTo(c.x, c.y - 10);
-        // ctx.lineTo(c.x + 20, c.y);
-        // ctx.lineTo(c.x, c.y + 10);
-        // ctx.lineTo(c.x + 20, c.y);
-        // ctx.lineTo(c.x, c.y + 10);
-        // ctx.lineTo(c.x - 40, c.y);
-        // ctx.lineTo(c.x, c.y - 10);
-        // ctx.lineTo(c.x - 40, c.y);
 
         // head
         ctx.beginPath();
-        ctx.fillStyle = "#d4d4d4";
+        ctx.fillStyle = "#11314e";
         // head
-        ctx.moveTo(c.x + 20, c.y);
-        ctx.lineTo(c.x + 18, c.y + 3);
-        ctx.lineTo(c.x + 10, c.y + 5);
-        ctx.lineTo(c.x + 10, c.y - 5);
-        ctx.lineTo(c.x + 18, c.y - 3);
+        ctx.moveTo(c.x + (20 * curFish.scale), c.y);
+        ctx.lineTo(c.x + (18 * curFish.scale), c.y + (3 * curFish.scale));
+        ctx.lineTo(c.x + (10 * curFish.scale), c.y + (5 * curFish.scale));
+        ctx.lineTo(c.x + (10 * curFish.scale), c.y - (5 * curFish.scale));
+        ctx.lineTo(c.x + (18 * curFish.scale), c.y - (3 * curFish.scale));
         // body
-        ctx.moveTo(c.x + 10, c.y + 5);
-        ctx.lineTo(c.x + 0, c.y + 5);
-        ctx.lineTo(c.x - 10, c.y + 3);
-        ctx.lineTo(c.x - 30, curFish.talePos);
-        ctx.lineTo(c.x - 10, c.y - 3);
-        ctx.lineTo(c.x + 0, c.y - 5);
-        ctx.lineTo(c.x + 10, c.y - 5);
+        ctx.moveTo(c.x + (10 * curFish.scale), c.y + (5 * curFish.scale));
+        ctx.lineTo(c.x + (0 * curFish.scale), c.y + (5 * curFish.scale));
+        ctx.lineTo(c.x - (10 * curFish.scale), c.y + (3 * curFish.scale));
+        ctx.lineTo(c.x - (30 * curFish.scale), (curFish.talePos * curFish.scale));
+        ctx.lineTo(c.x - (10 * curFish.scale), c.y - (3 * curFish.scale));
+        ctx.lineTo(c.x + (0 * curFish.scale), c.y - (5 * curFish.scale));
+        ctx.lineTo(c.x + (10 * curFish.scale), c.y - (5 * curFish.scale));
         ctx.fill();
         ctx.closePath();
         // fins
         ctx.moveTo(c.x, c.y);
-        ctx.lineTo(c.x - 3, c.y + 10);
-        ctx.lineTo(c.x + 10, c.y);
-        ctx.lineTo(c.x - 3, c.y - 10);
+        ctx.lineTo(c.x - (3 * curFish.scale), c.y + (10 * curFish.scale));
+        ctx.lineTo(c.x + (10 * curFish.scale), c.y);
+        ctx.lineTo(c.x - (3 * curFish.scale), c.y - (10 * curFish.scale));
         ctx.lineTo(c.x, c.y);
         ctx.fill();
         ctx.closePath();
@@ -228,36 +218,23 @@ function updateFish() {
         // Get scared by the mouse.
         if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 150 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
             rotateFish(curFish, Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI, 1);
-            curFish.velocity = 2;
-        }
-
-        // Get the closest neighbor and interact with them.
-        let neighbor = getClosestNeighbor(curFish);
-        if (neighbor.activeNeighbor != undefined && neighbor.dist < 50) {
-            rand = Math.random() * 1000;
-            if (rand <= 15) {
-                rotateFish(curFish, neighbor.activeNeighbor.angle, 5);
-                curFish.velocity = neighbor.activeNeighbor.velocity;
-            } else {
-                rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
+            curFish.velocity = 1.1;
+        } else {
+            // Get the closest neighbor and interact with them.
+            let neighbor = getClosestNeighbor(curFish);
+            if (neighbor.activeNeighbor != undefined && neighbor.dist < 50) {
+                rand = Math.ceil(Math.random() * 1000);
+                if (rand <= 5) {
+                    curFish.followNeighbors = !curFish.followNeighbors;
+                }
+                
+                if (curFish.followNeighbors) {
+                    rotateFish(curFish, neighbor.activeNeighbor.angle, 1);
+                } else {
+                    rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
+                }
             }
         }
-
-        // if (curFish.x < 0) {
-        //     curFish.x = 0;
-        //     rotateFish(curFish, Math.floor(Math.random() * (-90 - 90 +1)) + 90);
-        // } else if (curFish.x > canvas.clientWidth) {
-        //     curFish.x = canvas.clientWidth;
-        //     rotateFish(curFish, Math.floor(Math.random() * (90 - 180 +1)) + 180);
-        // }
-
-        // if (curFish.y < 0) {
-        //     curFish.y = 0;
-        //     rotateFish(curFish, Math.floor(Math.random() * (0 - 180 +1)) + 180);
-        // } else if (curFish.y > canvas.clientHeight) {
-        //     curFish.y = canvas.clientHeight;
-        //     rotateFish(curFish, Math.floor(Math.random() * (180 - 360 +1)) + 360);
-        // }
 
         // Keep the fish in bounds.
         if (curFish.x <= -50) {
