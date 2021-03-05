@@ -27,7 +27,7 @@ function tick() {
         maxFish = 300;
     }
 }
-window.setInterval(tick, 1);
+window.setInterval(tick, 5);
 
 let mouse = {
     x: 0,
@@ -225,6 +225,18 @@ function updateFish() {
             curFish.velocity = 0.5;
         }
 
+        // Get scared by the mouse.
+        if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 150 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
+            rotateFish(curFish, Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI, 1);
+            curFish.velocity = 2;
+        }
+
+        // Get the closest neighbor and interact with them.
+        let neighbor = getClosestNeighbor(curFish);
+        if (neighbor.activeNeighbor != undefined && neighbor.dist < 20) {
+            rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 1);
+        }
+
         // if (curFish.x < 0) {
         //     curFish.x = 0;
         //     rotateFish(curFish, Math.floor(Math.random() * (-90 - 90 +1)) + 90);
@@ -251,18 +263,6 @@ function updateFish() {
             curFish.y = canvas.clientHeight + 40;
         } else if (curFish.y >= canvas.clientHeight + 50) {
             curFish.y = -40;
-        }
-
-        // Get scared by the mouse.
-        if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 150 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
-            rotateFish(curFish, (Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI) + Math.floor(Math.random() * (20 - -20 +1)) + -20, 3);
-            curFish.velocity = 1.5;
-        }
-
-        // Get the closest neighbor and interact with them.
-        let neighbor = getClosestNeighbor(curFish);
-        if (neighbor.activeNeighbor != undefined && neighbor.dist < 20) {
-            rotateFish(curFish, (Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI) + Math.floor(Math.random() * (20 - -20 +1)) + -20, 1);
         }
     }
 }
