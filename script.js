@@ -1,3 +1,5 @@
+"use strict";
+
 let canTick = true;
 
 const ctx = canvas.getContext('2d');
@@ -49,6 +51,9 @@ function clearCanvas() {
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 }
 
+function randRange(min, max) {
+    return Math.floor(Math.random() * (max - min +1)) + min;
+}
 function distance(x1, y1, x2, y2) {
     return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
@@ -80,11 +85,11 @@ function createFish(x, y) {
         x: x,
         y: y,
         angle: Math.random() * 360,
+        scale: randRange(0.8, 1),
         velocity: Math.random() * 1.5,
         talePos: 0,
         taleDir: -0.30,
-        followNeighbors: false,
-        scale: Math.floor(Math.random() * (1.2 - 1 +1)) + 1
+        followNeighbors: false
     });
 }
 
@@ -115,6 +120,7 @@ function displayFish() {
         ctx.lineTo(c.x + (10 * curFish.scale), c.y + (5 * curFish.scale));
         ctx.lineTo(c.x + (10 * curFish.scale), c.y - (5 * curFish.scale));
         ctx.lineTo(c.x + (18 * curFish.scale), c.y - (3 * curFish.scale));
+        
         // body
         ctx.moveTo(c.x + (10 * curFish.scale), c.y + (5 * curFish.scale));
         ctx.lineTo(c.x + (0 * curFish.scale), c.y + (5 * curFish.scale));
@@ -125,6 +131,7 @@ function displayFish() {
         ctx.lineTo(c.x + (10 * curFish.scale), c.y - (5 * curFish.scale));
         ctx.fill();
         ctx.closePath();
+        
         // fins
         ctx.moveTo(c.x, c.y);
         ctx.lineTo(c.x - (3 * curFish.scale), c.y + (10 * curFish.scale));
