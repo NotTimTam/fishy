@@ -229,17 +229,21 @@ function updateFish() {
         } else {
             // Get the closest neighbor and interact with them.
             let neighbor = getClosestNeighbor(curFish);
-            if (neighbor.activeNeighbor != undefined && neighbor.dist < 50) {
-                rand = Math.ceil(Math.random() * 1000);
-                if (rand <= 5) {
-                    curFish.followNeighbors = !curFish.followNeighbors;
+            if (neighbor.dist > 25) {
+                if (neighbor.activeNeighbor != undefined && neighbor.dist < 50) {
+                    rand = Math.ceil(Math.random() * 1000);
+                    if (rand <= 5) {
+                        curFish.followNeighbors = !curFish.followNeighbors;
+                    }
+                    
+                    if (curFish.followNeighbors) {
+                        rotateFish(curFish, neighbor.activeNeighbor.angle, 1);
+                    } else {
+                        rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
+                    }
                 }
-                
-                if (curFish.followNeighbors) {
-                    rotateFish(curFish, neighbor.activeNeighbor.angle, 1);
-                } else {
-                    rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
-                }
+            } else {
+                rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
             }
         }
 
