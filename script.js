@@ -3,6 +3,7 @@
 let canTick = true;
 
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = true;
 
 function tick() {
     if (canTick) {
@@ -89,7 +90,8 @@ function createFish(x, y) {
         velocity: Math.random() * 1.5,
         talePos: 0,
         taleDir: -0.30,
-        followNeighbors: false
+        followNeighbors: false,
+        color: `rgb(${Math.random() * 17},${Math.random() * 49},${Math.random() * 78})`
     });
 }
 
@@ -113,27 +115,30 @@ function displayFish() {
 
         // head
         ctx.beginPath();
-        ctx.fillStyle = "#11314e";
+        ctx.fillStyle = curFish.color;
         // head
         ctx.moveTo(c.x + (20 * curFish.scale), c.y);
+        ctx.translate(0.5,0.5);
         ctx.lineTo(c.x + (18 * curFish.scale), c.y + (3 * curFish.scale));
         ctx.lineTo(c.x + (10 * curFish.scale), c.y + (5 * curFish.scale));
         ctx.lineTo(c.x + (10 * curFish.scale), c.y - (5 * curFish.scale));
         ctx.lineTo(c.x + (18 * curFish.scale), c.y - (3 * curFish.scale));
-        
+        ctx.fill();
+
         // body
         ctx.moveTo(c.x + (10 * curFish.scale), c.y + (5 * curFish.scale));
+        ctx.translate(0.5,0.5);
         ctx.lineTo(c.x + (0 * curFish.scale), c.y + (5 * curFish.scale));
         ctx.lineTo(c.x - (10 * curFish.scale), c.y + (3 * curFish.scale));
-        ctx.lineTo(c.x - (30 * curFish.scale), (curFish.talePos * curFish.scale));
+        ctx.lineTo(c.x - (22 * curFish.scale), c.y + (curFish.talePos * curFish.scale));
         ctx.lineTo(c.x - (10 * curFish.scale), c.y - (3 * curFish.scale));
         ctx.lineTo(c.x + (0 * curFish.scale), c.y - (5 * curFish.scale));
         ctx.lineTo(c.x + (10 * curFish.scale), c.y - (5 * curFish.scale));
         ctx.fill();
-        ctx.closePath();
         
         // fins
         ctx.moveTo(c.x, c.y);
+        ctx.translate(0.5,0.5);
         ctx.lineTo(c.x - (3 * curFish.scale), c.y + (10 * curFish.scale));
         ctx.lineTo(c.x + (10 * curFish.scale), c.y);
         ctx.lineTo(c.x - (3 * curFish.scale), c.y - (10 * curFish.scale));
@@ -196,14 +201,14 @@ function updateFish() {
         curFish.y += newFishPos.y;
 
         // Animate its tale.
-        curFish.talePos += (curFish.taleDir * curFish.velocity);
+        curFish.talePos += (curFish.taleDir * (curFish.velocity / 2));
 
-        if (curFish.talePos >= 10) {
-            curFish.talePos = 10;
-            curFish.taleDir *= -1;
+        if (curFish.talePos >= 9) {
+            curFish.talePos = 9;
+            curFish.taleDir = -1;
         } else if (curFish.talePos <= -5) {
             curFish.talePos = -5;
-            curFish.taleDir *= -1;
+            curFish.taleDir = 1;
         }
 
         // At random points in time the fish can change directions.
