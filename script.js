@@ -18,9 +18,9 @@ function tick() {
         return;
     }
 
-    if (fish.length > maxFish) {
+    while (fish.length > maxFish) {
         fish.shift();
-    } if (fish.length < maxFish) {
+    } while (fish.length < maxFish) {
         createFish(Math.random() * canvas.clientWidth, Math.random() * canvas.clientHeight);
     }
 
