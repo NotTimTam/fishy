@@ -326,7 +326,7 @@ function updateFish() {
         if (frenzy && food.length > 0) {
             // find food.
             let foundFood = getClosestFood(curFish);
-            rotateFish(curFish, angleBetweenPoints(foundFood, curFish), 3);
+            rotateFish(curFish, angleBetweenPoints(foundFood, curFish), 1.5);
         
             if (distance(curFish.x, curFish.y, foundFood.x, foundFood.y) < 25) {
                 food.splice(food.indexOf(foundFood), 1);
