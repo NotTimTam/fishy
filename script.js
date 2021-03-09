@@ -10,6 +10,8 @@ function tick() {
         canTick = false;
 
         clearCanvas();
+        displayFood();
+        updateFood();
         displayFish();
         updateFish();
 
@@ -34,11 +36,18 @@ window.setInterval(tick, 5);
 
 let mouse = {
     x: 0,
-    y: 0
+    y: 0,
+    down: false
 };
 document.addEventListener("mousemove", function (e) {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
+});
+document.addEventListener("mousedown", function() {
+    mouse.down = true;
+});
+document.addEventListener("mouseup", function() {
+    mouse.down = false;
 });
 
 function resizeCanvas() {
@@ -77,9 +86,64 @@ function positionToVector(x, y) {
         velocity: Math.sqrt(x ** 2 + y ** 2)
     };
 }
+function angleBetweenPoints(object1, object2) {
+    return Math.atan2(object1.y - object2.y, object1.x - object2.x) * 180 / Math.PI;
+}
 
 let fish = [];
 let maxFish = 25;
+let food = [];
+let frenzy = false;
+
+function createFood(x, y) {
+    let size = randRange(1, 5);
+    food.push({
+        x: x,
+        y: y,
+        size: size,
+        timeout: 600
+    });
+}
+
+function updateFood () {
+    if (food.length > 0) {
+        frenzy = true;
+    } else {
+        frenzy = false;
+        return;
+    }
+
+    for (let i = 0; i < food.length; i++) {
+        let curFood = food[i];
+        curFood.timeout --;
+
+        curFood.x += randRange(-.5, .5);
+        curFood.y += randRange(-.5, .5);
+
+        if (curFood.timeout <= 0) {
+            food.splice(food.indexOf(curFood), 1);
+        }
+    }
+
+    while (food.length > 100) {
+        food.shift();
+    }
+}
+
+function displayFood() {
+    for (let i = 0; i < food.length; i++) {
+        let curFood = food[i];
+        ctx.fillStyle = "tan";
+        ctx.beginPath();
+        ctx.ellipse(curFood.x, curFood.y, curFood.size, curFood.size, 0, 0, Math.PI * 2, false);
+        ctx.fill();
+    }
+}
+canvas.addEventListener("mousemove", function() {
+    if (mouse.down) {
+        createFood(mouse.x, mouse.y);
+    }
+});
 
 function createFish(x, y) {
     fish.push({
@@ -190,6 +254,22 @@ function getClosestNeighbor(curFish) {
     };
 }
 
+function getClosestFood(curFish) {
+    let dist = Infinity;
+    let activeFood;
+    for (let n = 0; n < food.length; n++) {
+        let foundFood = food[n];
+        let dt = distance(foundFood.x, foundFood.y, curFish.x, curFish.y);
+        
+        if (dt < dist) {
+            dist = dt;
+            activeFood = foundFood;
+        }
+    }
+
+    return activeFood;
+}
+
 function updateFish() {
     for (let i = 0; i < fish.length; i++) {
         // Get the current fish.
@@ -227,29 +307,46 @@ function updateFish() {
             curFish.velocity = 0.5;
         }
 
-        // Get scared by the mouse.
         let neighbor = getClosestNeighbor(curFish);
-        if (neighbor.dist > 25) {
-            if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 150 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
-                rotateFish(curFish, Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI, 3);
-                curFish.velocity = 1.1;
-            } else {
-                // Get the closest neighbor and interact with them.
-                if (neighbor.activeNeighbor != undefined && neighbor.dist < 50) {
-                    rand = Math.ceil(Math.random() * 1000);
-                    if (rand <= 5) {
-                        curFish.followNeighbors = !curFish.followNeighbors;
-                    }
-                    
-                    if (curFish.followNeighbors) {
-                        rotateFish(curFish, neighbor.activeNeighbor.angle, 1);
-                    } else {
-                        rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
+        if (neighbor.dist < 50) {
+            rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 3);
+        }
+
+        if (frenzy && food.length > 0) {
+            // find food.
+            let foundFood = getClosestFood(curFish);
+            rotateFish(curFish, angleBetweenPoints(foundFood, curFish), 3);
+        
+            if (distance(curFish.x, curFish.y, foundFood.x, foundFood.y) < 25) {
+                food.splice(food.indexOf(foundFood), 1);
+            }
+
+            curFish.velocity = randRange(2, 3);
+        } else {
+            // Get scared by the mouse.
+            let neighbor = getClosestNeighbor(curFish);
+            if (neighbor.dist > 25) {
+                if (distance(curFish.x, curFish.y, mouse.x, mouse.y) <= 150 && distance(curFish.x, curFish.y, mouse.x, mouse.y) > 50) {
+                    rotateFish(curFish, Math.atan2(curFish.y - mouse.y, curFish.x - mouse.x) * 180 / Math.PI, 3);
+                    curFish.velocity = 1.1;
+                } else {
+                    // Get the closest neighbor and interact with them.
+                    if (neighbor.activeNeighbor != undefined && neighbor.dist < 50) {
+                        rand = Math.ceil(Math.random() * 1000);
+                        if (rand <= 5) {
+                            curFish.followNeighbors = !curFish.followNeighbors;
+                        }
+                        
+                        if (curFish.followNeighbors) {
+                            rotateFish(curFish, neighbor.activeNeighbor.angle, 1);
+                        } else {
+                            rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
+                        }
                     }
                 }
+            } else {
+                rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
             }
-        } else {
-            rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 0.5);
         }
 
         // Keep the fish in bounds.
