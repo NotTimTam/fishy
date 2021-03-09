@@ -125,7 +125,7 @@ function updateFood () {
         }
     }
 
-    while (food.length > 100) {
+    while (food.length > 500) {
         food.shift();
     }
 }
@@ -307,6 +307,14 @@ function updateFish() {
             curFish.velocity = 0.5;
         }
 
+        curFish.scale -= 0.0005;
+
+        if (curFish.scale > 2) {
+            curFish.scale = 2;
+        } else if (curFish.scale < 1) {
+            curFish.scale = 1;
+        }
+
         let neighbor = getClosestNeighbor(curFish);
         if (neighbor.dist < 50) {
             rotateFish(curFish, Math.atan2(curFish.y - neighbor.activeNeighbor.y, curFish.x - neighbor.activeNeighbor.x) * 180 / Math.PI, 3);
@@ -319,6 +327,7 @@ function updateFish() {
         
             if (distance(curFish.x, curFish.y, foundFood.x, foundFood.y) < 25) {
                 food.splice(food.indexOf(foundFood), 1);
+                curFish.scale += 0.01;
             }
 
             curFish.velocity = randRange(2, 3);
