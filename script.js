@@ -101,7 +101,9 @@ function createFood(x, y) {
         x: x,
         y: y,
         size: size,
-        timeout: 600
+        timeout: 600,
+        angle: Math.random() * 360,
+        velocity: Math.random() * 0.5
     });
 }
 
@@ -117,8 +119,9 @@ function updateFood () {
         let curFood = food[i];
         curFood.timeout --;
 
-        curFood.x += randRange(-.5, .5);
-        curFood.y += randRange(-.5, .5);
+        let updatedPos = vectorToPosition(curFood.angle, curFood.velocity);
+        curFood.x += updatedPos.x;
+        curFood.y += updatedPos.y;
 
         if (curFood.timeout <= 0) {
             food.splice(food.indexOf(curFood), 1);
@@ -307,7 +310,7 @@ function updateFish() {
             curFish.velocity = 0.5;
         }
 
-        curFish.scale -= 0.0005;
+        curFish.scale -= 0.0001;
 
         if (curFish.scale > 2) {
             curFish.scale = 2;
@@ -327,10 +330,8 @@ function updateFish() {
         
             if (distance(curFish.x, curFish.y, foundFood.x, foundFood.y) < 25) {
                 food.splice(food.indexOf(foundFood), 1);
-                curFish.scale += 0.01;
+                curFish.scale += 0.05;
             }
-
-            curFish.velocity = randRange(2, 3);
         } else {
             // Get scared by the mouse.
             let neighbor = getClosestNeighbor(curFish);
